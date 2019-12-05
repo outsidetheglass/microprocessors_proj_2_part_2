@@ -28,12 +28,12 @@ _start:
 	@ #0x01200000 is value for turning on high LEDs 3 and 0
 	@ #0x00C00000 is value for turning on high LEDs 2 and 1
 	
-	ADD R4,R0,#0x194		@ address for GPIO1_SETDATAOUT
-	ADD R3,R0,#0x190		@ address for GPIO1_CLEARDATAOUT
+	ADD R10,R0,#0x194		@ address for GPIO1_SETDATAOUT
+	ADD R11,R0,#0x190		@ address for GPIO1_CLEARDATAOUT
 	
-	STR R7,[R4]				@ put LED 1 and 2 high value into the set register to turn on
+	STR R7,[R10]				@ put LED 1 and 2 high value into the set register to turn on
 	ADD R7,R7,#0x00600000	@ add to get value for setting LEDs 3 and 0
-	STR R7,[R3]				@ put LED 3 and 0 high value in to clear them
+	STR R7,[R11]				@ put LED 3 and 0 high value in to clear them
 	@ at this point R7 holds the value for LED 3 and 0 high
 
 	ADD R1,R0,#0x134		@ Register address for GPIO1_OE
@@ -43,23 +43,23 @@ _start:
 	STR R6,[R1]				@ put back in to OE register
 	
 @ Now lets actually initialize the output
-	ADD R5,R0,#0x14C		@ address for GPIO1_FALLINGDETECT
-	LDR R12,[R5]			@ Read current falling detect register
-	MOV R11,#0x20000000		@ value for initializing the button
-	ORR R12,R12,R11			@ Set bit 26
-	STR R12,[R5]			@ set falling detect for button
-	ADD R5,R0,#0x34			@ Address for IRQ status register
-	STR R11,[R5]			@ enable pointer pend for GPIO1_26 pin
+	ADD R1,R0,#0x14C		@ address for GPIO1_FALLINGDETECT
+	LDR R2,[R1]			@ Read current falling detect register
+	MOV R2,#0x20000000		@ value for initializing the button
+	ORR R3,R3,R2			@ Set bit 26
+	STR R3,[R1]			@ set falling detect for button
+	ADD R1,R0,#0x2C			@ Address for IRQ status register
+	STR R2,[R1]			@ enable pointer pend for GPIO1_26 pin
 	
 @ initialize the INTC
-	LDR R5,=0x482000E8		@ address of INTC_MIR_CLEAR3
-	MOV R12,#0x04			@ value for unmasking
-	STR R12,[R5]				@ write to the register
+	LDR R1,=0x482000E8		@ address of INTC_MIR_CLEAR3
+	MOV R2,#0x04			@ value for unmasking
+	STR R2,[R1]				@ write to the register
 	
 @ enable processor IRQ in CPSR
-	MRS R12, CPSR			@ Copy CPSR to R12
-	BIC R12,#0x80			@ Clear bit 7
-	MSR CPSR_c, R12			@ write back to CPSR
+	MRS R3, CPSR			@ Copy CPSR to R12
+	BIC R3,#0x80			@ Clear bit 7
+	MSR CPSR_c, R3			@ write back to CPSR
 	
 @ Wait for Interrupt
 LOOP:	NOP
@@ -97,17 +97,17 @@ BUTTON_SVC:
 
 @ blink the USR LEDs 3 and 0
 BLINK03:
-	STR R7,[R3]				@ put LED 2 and 1 high value into the CLEARDATAOUT
+	STR R7,[R11]				@ put LED 2 and 1 high value into the CLEARDATAOUT
 	ADD R7,R7,#0x00600000	@ add to get value for setting LEDs 3 and 0
-	STR R7,[R4]				@ put LED 3 and 0 high value into the SETDATAOUT		
+	STR R7,[R10]				@ put LED 3 and 0 high value into the SETDATAOUT		
 	MOV R10,#0x00400000		@ delay value
 	B DELAY
 	
 @ blink the USR LEDs 2 and 1
 BLINK12:
-	STR R7,[R3]				@ put LED 3 and 0 high value into the CLEARDATAOUT
+	STR R7,[R11]				@ put LED 3 and 0 high value into the CLEARDATAOUT
 	SUB R7,R7,#0x00600000	@ subtract to get value for setting LEDs 1 and 2	
-	STR R7,[R4]				@ put LED 2 and 1 high value into the SETDATAOUT
+	STR R7,[R10]				@ put LED 2 and 1 high value into the SETDATAOUT
 	MOV R10,#0x00400000		@ delay value
 	B DELAY
 @ loop for 2 seconds
