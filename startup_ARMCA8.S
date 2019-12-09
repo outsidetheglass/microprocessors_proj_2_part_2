@@ -151,9 +151,8 @@ __HeapLimit:
 @
 @ Set the Interrupt vector table here
 @
-
-.extern	INT_DIRECTOR
-.section .isr_vector
+@	.extern INT_DIRECTOR
+    .section .isr_vector
     .align 4
     .globl  __isr_vector
 __isr_vector:
@@ -163,7 +162,7 @@ __isr_vector:
         LDR   pc, [pc,#-8]       @ 0x0C Prefetch Abort
         LDR   pc, [pc,#-8]       @ 0x10 Data Abort
         LDR   pc, [pc,#-8]       @ 0x14 Not used
-        b	  	INT_DIRECTOR       @ 0x18 IRQ interrupt goes to my int director now
+        B	INT_DIRECTOR       @ 0x18 IRQ interrupt
         LDR   pc, [pc,#-8]       @ 0x1C FIQ interrupt
         .long  Entry
         .long  0
